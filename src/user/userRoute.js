@@ -9,5 +9,7 @@ router.post("/api/users/login", controller.login);
 
 router.use(authenticate);
 router.get("/api/users/current", controller.get);
+router.put("/api/users/current", controller.update);
+router.delete("/api/users/current", controller.logout);
 
 module.exports = router;

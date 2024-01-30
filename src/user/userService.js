@@ -21,7 +21,13 @@ const register = async (request) => {
 
      const result = await repository.insertUser(data);
 
-     return result[0];
+     const response = {
+          id: result[0].id,
+          username: result[0].username,
+          name: result[0].name,
+     };
+
+     return response;
 };
 
 const login = async (request) => {
@@ -33,11 +39,9 @@ const login = async (request) => {
           throw new ErrorHandling(401, "username or password is wrong");
      }
 
-     const userPassword = await repository.findPassword(user[0].id);
-
      const isPasswordValid = await bcrypt.compare(
           data.password,
-          userPassword[0].password
+          user[0].password
      );
 
      if (!isPasswordValid) {
@@ -54,9 +58,9 @@ const login = async (request) => {
           }
      );
 
-     const result = { token };
+     const response = { token };
 
-     return result;
+     return response;
 };
 
 const get = async (request) => {
@@ -68,13 +72,65 @@ const get = async (request) => {
           throw new ErrorHandling(404, "User not found");
      }
 
-     const result = user[0];
+     const response = {
+          id: user[0].id,
+          username: user[0].username,
+          name: user[0].name,
+     };
 
-     return result;
+     return response;
+};
+
+const update = async (request) => {
+     const data = validate(request, schema.update);
+
+     const user = await repository.findUserById(data.id);
+
+     if (!user.length > 0) {
+          throw new ErrorHandling(404, "User not found");
+     }
+     const dataUpdate = {
+          id: data.id,
+     };
+
+     if (data.password) {
+          dataUpdate.password = await bcrypt.hash(data.password, 10);
+     }
+     if (data.name) {
+          dataUpdate.name = data.name;
+     }
+
+     const result = await repository.updateUser(dataUpdate);
+
+     const response = {
+          id: result[0].id,
+          username: result[0].username,
+          name: result[0].name,
+     };
+
+     return response;
+};
+
+const logout = async (request) => {
+     const data = validate(request, schema.logout);
+
+     const user = await repository.findUserById(data.id);
+
+     if (!user.length > 0) {
+          throw new ErrorHandling(404, "User not found");
+     }
+
+     const token = null;
+
+     const response = { token };
+
+     return response;
 };
 
 module.exports = {
      register,
      login,
      get,
+     update,
+     logout,
 };

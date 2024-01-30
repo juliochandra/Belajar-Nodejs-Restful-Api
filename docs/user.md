@@ -25,7 +25,6 @@ Response Body Success :
 Response Body Error
 
     {
-        "success" : false,
         "errors" : "username already exist"
     }
 

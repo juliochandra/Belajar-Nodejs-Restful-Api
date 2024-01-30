@@ -1,31 +1,28 @@
 const db = require("../lib/db");
 
 const findUser = async (username) => {
-     const result = db("users")
-          .select(["id", "username", "name"])
-          .where({ username });
+     const result = db("users").select(["*"]).where({ username });
 
      return result;
 };
 
 const findUserById = async (id) => {
-     const result = db("users")
-          .select(["id", "username", "name"])
-          .where({ id });
-
-     return result;
-};
-
-const findPassword = async (id) => {
-     const result = db("users").select(["password"]).where({ id });
+     const result = db("users").select(["*"]).where({ id });
 
      return result;
 };
 
 const insertUser = async (userData) => {
+     const result = await db("users").insert(userData).returning(["*"]);
+
+     return result;
+};
+
+const updateUser = async (userData) => {
      const result = await db("users")
-          .insert(userData)
-          .returning(["id", "username", "name"]);
+          .where({ id: userData.id })
+          .update(userData)
+          .returning(["*"]);
 
      return result;
 };
@@ -33,6 +30,6 @@ const insertUser = async (userData) => {
 module.exports = {
      findUser,
      findUserById,
-     findPassword,
      insertUser,
+     updateUser,
 };
